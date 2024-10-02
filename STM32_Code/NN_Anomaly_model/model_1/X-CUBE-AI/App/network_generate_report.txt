@@ -1,0 +1,145 @@
+STEdgeAI Core v9.0.0-19802
+Created date          : 2024-10-02 16:36:35
+Parameters            : generate --target stm32f7 --name network -m C:/Varsity/Year of Study 4 (IE)/Semester 2/Investigation Project/Project Implementation/Code/Experimentation/Autoencoder/Cable-98-Accuracy-db-tf.keras --compression medium --verbosity 1 --allocate-inputs --allocate-outputs --workspace C:/Users/DILDOB~1/AppData/Local/Temp/mxAI_workspace1301374328620010149895151264410702 --output C:/Users/Dildo Baggins/.stm32cubemx/network_output
+
+Exec/report summary (generate)
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+model file         :   C:\Varsity\Year of Study 4 (IE)\Semester 2\Investigation Project\Project Implementation\Code\Experimentation\Autoencoder\Cable-98-Accuracy-db-tf.keras   
+type               :   keras                                                                                                                                                    
+c_name             :   network                                                                                                                                                  
+compression        :   medium                                                                                                                                                   
+options            :   allocate-inputs, allocate-outputs                                                                                                                        
+optimization       :   balanced                                                                                                                                                 
+target/series      :   stm32f7                                                                                                                                                  
+workspace dir      :   C:\Users\DILDOB~1\AppData\Local\Temp\mxAI_workspace1301374328620010149895151264410702                                                                    
+output dir         :   C:\Users\Dildo Baggins\.stm32cubemx\network_output                                                                                                       
+model_fmt          :   float                                                                                                                                                    
+model_name         :   Cable98Accuracydbtf                                                                                                                                      
+model_hash         :   0x2bef7bbefad2e799513993eb17d5c89b                                                                                                                       
+params #           :   962,274 items (3.67 MiB)                                                                                                                                 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+input 1/1          :   'input_0', f32(1x100x100x3), 117.19 KBytes, activations                                                                                                  
+output 1/1         :   'dense_2', f32(1x2), 8 Bytes, activations                                                                                                                
+macc               :   962,370                                                                                                                                                  
+weights (ro)       :   489,160 B (477.70 KiB) (1 segment) / -3,359,936(-87.3%) vs float model                                                                                   
+activations (rw)   :   120,128 B (117.31 KiB) (1 segment) *                                                                                                                     
+ram (total)        :   120,128 B (117.31 KiB) = 120,128 + 0 + 0                                                                                                                 
+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(*) 'input'/'output' buffers can be used from the activations buffer
+
+Model name - Cable98Accuracydbtf
+------ ------------------------------- ----------------------- ------------------- --------- --------------- --- -------------------- -------------- ---------------------------- 
+m_id   layer (type,original)           oshape                  param/size               macc    connected to   | c_size               c_macc         c_type                       
+------ ------------------------------- ----------------------- ------------------- --------- --------------- --- -------------------- -------------- ---------------------------- 
+0      input_0 (Input, None)           [b:1,h:100,w:100,c:3]                                                   |                                     
+       flatten (Reshape, Flatten)      [b:1,c:30000]                                                 input_0   |                                     
+------ ------------------------------- ----------------------- ------------------- --------- --------------- --- -------------------- -------------- ---------------------------- 
+1      dense_dense (Dense, Dense)      [b:1,c:32]              960,032/3,840,128     960,032         flatten   | -3,360,000(-87.5%)   +32(+0.0%)     Dense_/Nonlinearity_[0, 1]   
+       dense (Nonlinearity, Dense)     [b:1,c:32]                                         32     dense_dense   |                      -32(-100.0%)   
+------ ------------------------------- ----------------------- ------------------- --------- --------------- --- -------------------- -------------- ---------------------------- 
+2      dense_1_dense (Dense, Dense)    [b:1,c:64]              2,112/8,448             2,112           dense   |                      +64(+3.0%)     Dense_/Nonlinearity_[2, 3]   
+       dense_1 (Nonlinearity, Dense)   [b:1,c:64]                                         64   dense_1_dense   |                      -64(-100.0%)   
+------ ------------------------------- ----------------------- ------------------- --------- --------------- --- -------------------- -------------- ---------------------------- 
+3      dense_2 (Dense, Dense)          [b:1,c:2]               130/520                   130         dense_1   |                                     Dense_[o][4]                 
+------ ------------------------------- ----------------------- ------------------- --------- --------------- --- -------------------- -------------- ---------------------------- 
+model/c-model: macc=962,370/962,370  weights=3,849,096/489,160 -3,359,936(-87.3%) activations=--/120,128 io=--/0
+
+
+
+Generated C-graph summary
+------------------------------------------------------------------------------------------------------------------------
+model name            : Cable98Accuracydbtf
+c-name                : network
+c-node #              : 5
+c-array #             : 12
+activations size      : 120128 (1 segment)
+weights size          : 489160 (1 segment)
+macc                  : 962370
+inputs                : ['input_0_output']
+outputs               : ['dense_2_output']
+
+C-Arrays (12)
+------ ----------------------- --------------- ------------------------- ------------------ --------- 
+c_id   name (*_array)          item/size       domain/mem-pool           c-type             comment   
+------ ----------------------- --------------- ------------------------- ------------------ --------- 
+0      dense_1_dense_bias      64/256          weights/weights           const float                  
+1      dense_1_dense_output    64/256          activations/**default**   float                        
+2      dense_1_dense_weights   2048/8192       weights/weights           const float                  
+3      dense_1_output          64/256          activations/**default**   float                        
+4      dense_2_bias            2/8             weights/weights           const float                  
+5      dense_2_output          2/8             activations/**default**   float              /output   
+6      dense_2_weights         128/512         weights/weights           const float                  
+7      dense_dense_bias        32/128          weights/weights           const float                  
+8      dense_dense_output      32/128          activations/**default**   float                        
+9      dense_dense_weights     960000/480000   weights/weights           const lut4_float             
+10     dense_output            32/128          activations/**default**   float                        
+11     input_0_output          30000/120000    activations/**default**   float              /input    
+------ ----------------------- --------------- ------------------------- ------------------ --------- 
+
+C-Layers (5)
+------ ---------------- ---- --------------- -------- -------- -------------------------- ----------------------- 
+c_id   name (*_layer)   id   layer_type      macc     rom      tensors                    shape (array id)        
+------ ---------------- ---- --------------- -------- -------- -------------------------- ----------------------- 
+0      dense_dense      1    Dense           960032   480128   I: input_0_output          f32(1x100x100x3) (11)   
+                                                               W: dense_dense_weights     c4(32x30000) (9)        
+                                                               W: dense_dense_bias        f32(32) (7)             
+                                                               O: dense_dense_output      f32(1x32) (8)           
+------ ---------------- ---- --------------- -------- -------- -------------------------- ----------------------- 
+1      dense            1    Nonlinearity    32       0        I: dense_dense_output      f32(1x32) (8)           
+                                                               O: dense_output            f32(1x32) (10)          
+------ ---------------- ---- --------------- -------- -------- -------------------------- ----------------------- 
+2      dense_1_dense    2    Dense           2112     8448     I: dense_output            f32(1x32) (10)          
+                                                               W: dense_1_dense_weights   f32(64x32) (2)          
+                                                               W: dense_1_dense_bias      f32(64) (0)             
+                                                               O: dense_1_dense_output    f32(1x64) (1)           
+------ ---------------- ---- --------------- -------- -------- -------------------------- ----------------------- 
+3      dense_1          2    Nonlinearity    64       0        I: dense_1_dense_output    f32(1x64) (1)           
+                                                               O: dense_1_output          f32(1x64) (3)           
+------ ---------------- ---- --------------- -------- -------- -------------------------- ----------------------- 
+4      dense_2          3    Dense           130      520      I: dense_1_output          f32(1x64) (3)           
+                                                               W: dense_2_weights         f32(2x64) (6)           
+                                                               W: dense_2_bias            f32(2) (4)              
+                                                               O: dense_2_output          f32(1x2) (5)            
+------ ---------------- ---- --------------- -------- -------- -------------------------- ----------------------- 
+
+
+
+Number of operations per c-layer
+------- ------ ------------------------ --------- -------------- 
+c_id    m_id   name (type)                    #op           type 
+------- ------ ------------------------ --------- -------------- 
+0       1      dense_dense (Dense)        960,032    smul_f32_f4 
+1       1      dense (Nonlinearity)            32     op_f32_f32 
+2       2      dense_1_dense (Dense)        2,112   smul_f32_f32 
+3       2      dense_1 (Nonlinearity)          64     op_f32_f32 
+4       3      dense_2 (Dense)                130   smul_f32_f32 
+------- ------ ------------------------ --------- -------------- 
+total                                     962,370 
+
+Number of operation types
+---------------- --------- ----------- 
+operation type           #           % 
+---------------- --------- ----------- 
+smul_f32_f4        960,032       99.8% 
+op_f32_f32              96        0.0% 
+smul_f32_f32         2,242        0.2% 
+
+Complexity report (model)
+------ --------------- ------------------------- ------------------------- -------- 
+m_id   name            c_macc                    c_rom                     c_id     
+------ --------------- ------------------------- ------------------------- -------- 
+1      dense_dense     ||||||||||||||||  99.8%   ||||||||||||||||  98.2%   [0, 1]   
+2      dense_1_dense   |                  0.2%   |                  1.7%   [2, 3]   
+3      dense_2         |                  0.0%   |                  0.1%   [4]      
+------ --------------- ------------------------- ------------------------- -------- 
+macc=962,370 weights=489,160 act=120,128 ram_io=0
+
+Generated files (7)
+-------------------------------------------------------------------------- 
+C:\Users\Dildo Baggins\.stm32cubemx\network_output\network_data_params.h   
+C:\Users\Dildo Baggins\.stm32cubemx\network_output\network_data_params.c   
+C:\Users\Dildo Baggins\.stm32cubemx\network_output\network_data.h          
+C:\Users\Dildo Baggins\.stm32cubemx\network_output\network_data.c          
+C:\Users\Dildo Baggins\.stm32cubemx\network_output\network_config.h        
+C:\Users\Dildo Baggins\.stm32cubemx\network_output\network.h               
+C:\Users\Dildo Baggins\.stm32cubemx\network_output\network.c               
