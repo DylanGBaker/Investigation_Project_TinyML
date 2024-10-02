@@ -1,0 +1,10 @@
+*.png
+*.json
+*.metadata
+*.ai
+*.settings
+
+
+Debug/
+Drivers/
+Middlewares/
