@@ -23,7 +23,8 @@
 /* USER CODE BEGIN Includes */
 #include "network.h"
 #include "network_data.h"
-#include "image_data.h"
+#include "good_image_data_11.h"
+#include "stdio.h"
 
 /* USER CODE END Includes */
 
@@ -46,6 +47,10 @@
 
 CRC_HandleTypeDef hcrc;
 
+TIM_HandleTypeDef htim14;
+
+UART_HandleTypeDef huart1;
+
 /* USER CODE BEGIN PV */
 
 /* USER CODE END PV */
@@ -55,12 +60,16 @@ void SystemClock_Config(void);
 static void MPU_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_CRC_Init(void);
+static void MX_TIM14_Init(void);
+static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+//__attribute__((section(".sdram_data"))) const float good_image_data[10][30000];
 
 /* USER CODE END 0 */
 
@@ -72,6 +81,9 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
+	char uart_buf[50];
+	int uart_buf_len = 0;
+	uint16_t timer_val = 0;
 
   /* USER CODE END 1 */
 
@@ -105,83 +117,134 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_CRC_Init();
+  MX_TIM14_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
+
+  // THIS IS FOR THE COMPRESSION VALUE OF LOW!!!!!!!
 
   static ai_handle network = AI_HANDLE_NULL;
 
-        /* Global c-array to handle the activations buffer */
-        AI_ALIGNED(32)
-        static ai_u8 activations[AI_NETWORK_DATA_ACTIVATIONS_SIZE];
+      /* Global c-array to handle the activations buffer */
+      AI_ALIGNED(32)
+      static ai_u8 activations[AI_NETWORK_DATA_ACTIVATIONS_SIZE];
 
-        /* Array to store the data of the input tensor */
-        AI_ALIGNED(32)
-        static ai_float in_data[AI_NETWORK_IN_1_SIZE];
-        /* or static ai_u8 in_data[AI_NETWORK_IN_1_SIZE_BYTES]; */
+      /* Array to store the data of the input tensor */
+      AI_ALIGNED(32)
+      static ai_float in_data[AI_NETWORK_IN_1_SIZE];
+      /* or static ai_u8 in_data[AI_NETWORK_IN_1_SIZE_BYTES]; */
 
-        /* c-array to store the data of the output tensor */
-        AI_ALIGNED(32)
-        static ai_float out_data[AI_NETWORK_OUT_1_SIZE];
-      //  static ai_u8 out_data[AI_NETWORK_OUT_1_SIZE_BYTES];
+      /* c-array to store the data of the output tensor */
+      AI_ALIGNED(32)
+      static ai_float out_data[AI_NETWORK_OUT_1_SIZE];
+    //  static ai_u8 out_data[AI_NETWORK_OUT_1_SIZE_BYTES];
 
-        /* Array of pointer to manage the model's input/output tensors */
-        static ai_buffer *ai_input;
-        static ai_buffer *ai_output;
+      /* Array of pointer to manage the model's input/output tensors */
+      static ai_buffer *ai_input;
+      static ai_buffer *ai_output;
 
-        int aiInit(void) {
-            ai_error err;
+      int aiInit(void) {
+          ai_error err;
 
-            /* Create and initialize the c-model */
-            const ai_handle acts[] = { activations };
-            err = ai_network_create_and_init(&network, acts, NULL);
-            if (err.type != AI_ERROR_NONE) {}
+          /* Create and initialize the c-model */
+          const ai_handle acts[] = { activations };
+          err = ai_network_create_and_init(&network, acts, NULL);
+          if (err.type != AI_ERROR_NONE) {}
 
-            /* Reteive pointers to the model's input/output tensors */
-            ai_input = ai_network_inputs_get(network, NULL);
-            ai_output = ai_network_outputs_get(network, NULL);
+          /* Reteive pointers to the model's input/output tensors */
+          ai_input = ai_network_inputs_get(network, NULL);
+          ai_output = ai_network_outputs_get(network, NULL);
 
-            return 0;
-          }
-
-        int aiRun(const void *in_data, void *out_data) {
-            ai_i32 n_batch;
-            ai_error err;
-
-            /* 1 - Update IO handlers with the data payload */
-            ai_input[0].data = AI_HANDLE_PTR(in_data);
-            ai_output[0].data = AI_HANDLE_PTR(out_data);
-
-            /* 2 - Perform the inference */
-            n_batch = ai_network_run(network, &ai_input[0], &ai_output[0]);
-            if (n_batch != 1) {
-                err = ai_network_get_error(network);
-            };
-
-            return 0;
-          }
-
-
-        int argmax(ai_float nn_output[]){
-
-      	  if (nn_output[0] > nn_output[1]){
-      		  return 0;
-      	  }
-      	  else{
-      		  return 1;
-      	  }
+          return 0;
         }
 
-        uint8_t counter = 0;
-        int argmax_output = 0;
-        float acc = 0.0;
+      int aiRun(const void *in_data, void *out_data) {
+          ai_i32 n_batch;
+          ai_error err;
 
-      float get_accuracy(int counter, int num_images){
-      	  int count_value = counter;
-      	  float accuracy = (float)(count_value/num_images);
-      	  return accuracy;
+          /* 1 - Update IO handlers with the data payload */
+          ai_input[0].data = AI_HANDLE_PTR(in_data);
+          ai_output[0].data = AI_HANDLE_PTR(out_data);
+
+          /* 2 - Perform the inference */
+          n_batch = ai_network_run(network, &ai_input[0], &ai_output[0]);
+          if (n_batch != 1) {
+              err = ai_network_get_error(network);
+          };
+
+          return 0;
         }
 
-        aiInit();
 
+      int argmax(ai_float nn_output[]){
+
+    	  if (nn_output[0] > nn_output[1]){
+    		  return 0;
+    	  }
+    	  else{
+    		  return 1;
+    	  }
+      }
+
+      uint8_t counter = 0;
+      int argmax_output = 0;
+      float acc = 0.0;
+      int true_positives = 0;
+      int false_negatives = 0;
+
+      int false_positives = 0;
+      int true_negatives = 0;
+      int final_outputs[3] = {0, 0, 0};
+
+    float get_accuracy(int counter, float num_images){
+    	  int count_value = counter;
+    	  float accuracy = (float)(count_value/num_images);
+    	  return accuracy;
+      }
+
+    void calculate_true_positives(int output[], int size){
+
+    	for(int i = 0; i < size; i++){
+    		if (output[i] == 0){
+    			true_positives++;
+    		}
+    	}
+    }
+
+
+    void calculate_false_negatives(int output[], int size){
+
+        	for(int i = 0; i < size; i++){
+        		if (output[i] == 1){
+        			false_negatives++;
+        		}
+        	}
+        }
+
+    void calculate_false_positives(int output[], int size){
+
+            	for(int i = 0; i < size; i++){
+            		if (output[i] == 0){
+            			false_positives++;
+            		}
+            	}
+            }
+
+    void calculate_true_negatives(int output[], int size){
+
+            	for(int i = 0; i < size; i++){
+            		if (output[i] == 1){
+            			true_negatives++;
+            		}
+            	}
+            }
+
+
+
+      aiInit();
+
+
+      HAL_TIM_Base_Start(&htim14);
 
   /* USER CODE END 2 */
 
@@ -189,26 +252,35 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  for (int i = 0; i < 5; i++){
-	  		  for (int j = 0; j < AI_NETWORK_IN_1_SIZE; j++){
-	  		  	  	  		  ((ai_float*)in_data)[j] = image_data[i][j];
-	  		  	  	  	  }
+	  for (int i = 0; i < 3; i++){
+		  for (int j = 0; j < AI_NETWORK_IN_1_SIZE; j++){
+		  	  	  		  ((ai_float*)in_data)[j] = image_data[i][j];
+		  	  	  	  }
 
-	  		  	  	  	  aiRun(in_data, out_data);
+		  	  	  	  timer_val = __HAL_TIM_GET_COUNTER(&htim14);
+		  	  	  	  aiRun(in_data, out_data);
+		  	  	  	  timer_val = __HAL_TIM_GET_COUNTER(&htim14) - timer_val;
 
-	  		  	  	  	  argmax_output = argmax(out_data);
+		  	  	  	  uart_buf_len = sprintf(uart_buf, "%u us\r\n", timer_val);
+		  	  	      HAL_UART_Transmit(&huart1, (uint8_t *)uart_buf, uart_buf_len, 100);
 
-	  		  	  	  	  if (argmax_output == 0){
-	  		  	  	  		  counter++;
-	  		  	  	  	  }
+		  	  	  	  argmax_output = argmax(out_data);
+		  	  	  	  final_outputs[i] = argmax_output;
 
 
-	  		  	  	  	  //HAL_UART_Transmit(&huart1, message, 50, HAL_MAX_DELAY);
-//	  		  	  	  	  HAL_Delay(2000);
-	  	  }
+		  	  	  	  //HAL_UART_Transmit(&huart1, message, 50, HAL_MAX_DELAY);
+//		  	  	  	  HAL_Delay(2000);
+	  }
 
-	  	  acc = get_accuracy(counter, 5);
-	  	  counter = 0;
+	  //acc = get_accuracy(counter, 5.0);
+
+	  uart_buf_len = sprintf(uart_buf, "\r\n \r\n \r\n \r\n");
+	  HAL_UART_Transmit(&huart1, (uint8_t *)uart_buf, uart_buf_len, 100);
+//	  calculate_true_positives(final_outputs, 2);
+//	  calculate_false_negatives(final_outputs, 2);
+	  calculate_false_positives(final_outputs, 3);
+	  calculate_true_negatives(final_outputs, 3);
+
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -302,6 +374,72 @@ static void MX_CRC_Init(void)
 }
 
 /**
+  * @brief TIM14 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM14_Init(void)
+{
+
+  /* USER CODE BEGIN TIM14_Init 0 */
+
+  /* USER CODE END TIM14_Init 0 */
+
+  /* USER CODE BEGIN TIM14_Init 1 */
+
+  /* USER CODE END TIM14_Init 1 */
+  htim14.Instance = TIM14;
+  htim14.Init.Prescaler = 107;
+  htim14.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim14.Init.Period = 65535;
+  htim14.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim14.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim14) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN TIM14_Init 2 */
+
+  /* USER CODE END TIM14_Init 2 */
+
+}
+
+/**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
+}
+
+/**
   * @brief GPIO Initialization Function
   * @param None
   * @retval None
@@ -312,6 +450,7 @@ static void MX_GPIO_Init(void)
 /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */

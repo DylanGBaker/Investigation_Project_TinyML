@@ -23,7 +23,8 @@
 /* USER CODE BEGIN Includes */
 #include "network.h"
 #include "network_data.h"
-#include "good_image_data.h"
+#include "good_image_data_10.h"
+#include "stdio.h"
 
 /* USER CODE END Includes */
 
@@ -46,7 +47,9 @@
 
 CRC_HandleTypeDef hcrc;
 
-SDRAM_HandleTypeDef hsdram1;
+TIM_HandleTypeDef htim14;
+
+UART_HandleTypeDef huart1;
 
 /* USER CODE BEGIN PV */
 
@@ -57,7 +60,8 @@ void SystemClock_Config(void);
 static void MPU_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_CRC_Init(void);
-static void MX_FMC_Init(void);
+static void MX_TIM14_Init(void);
+static void MX_USART1_UART_Init(void);
 /* USER CODE BEGIN PFP */
 
 /* USER CODE END PFP */
@@ -77,6 +81,9 @@ int main(void)
 {
 
   /* USER CODE BEGIN 1 */
+	char uart_buf[50];
+	int uart_buf_len = 0;
+	uint16_t timer_val = 0;
 
   /* USER CODE END 1 */
 
@@ -110,7 +117,8 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_CRC_Init();
-  MX_FMC_Init();
+  MX_TIM14_Init();
+  MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
 
   // THIS IS FOR THE COMPRESSION VALUE OF LOW!!!!!!!
@@ -181,6 +189,12 @@ int main(void)
       uint8_t counter = 0;
       int argmax_output = 0;
       float acc = 0.0;
+      int true_positives = 0;
+      int false_negatives = 0;
+
+      int false_positives = 0;
+      int true_negatives = 0;
+      int final_outputs[3] = {0, 0, 0};
 
     float get_accuracy(int counter, float num_images){
     	  int count_value = counter;
@@ -188,7 +202,49 @@ int main(void)
     	  return accuracy;
       }
 
+    void calculate_true_positives(int output[], int size){
+
+    	for(int i = 0; i < size; i++){
+    		if (output[i] == 0){
+    			true_positives++;
+    		}
+    	}
+    }
+
+
+    void calculate_false_negatives(int output[], int size){
+
+        	for(int i = 0; i < size; i++){
+        		if (output[i] == 1){
+        			false_negatives++;
+        		}
+        	}
+        }
+
+    void calculate_false_positives(int output[], int size){
+
+            	for(int i = 0; i < size; i++){
+            		if (output[i] == 0){
+            			false_positives++;
+            		}
+            	}
+            }
+
+    void calculate_true_negatives(int output[], int size){
+
+            	for(int i = 0; i < size; i++){
+            		if (output[i] == 1){
+            			true_negatives++;
+            		}
+            	}
+            }
+
+
+
       aiInit();
+
+
+      HAL_TIM_Base_Start(&htim14);
 
   /* USER CODE END 2 */
 
@@ -196,26 +252,34 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  for (int i = 0; i < 5; i++){
+	  for (int i = 0; i < 3; i++){
 		  for (int j = 0; j < AI_NETWORK_IN_1_SIZE; j++){
-		  	  	  		  ((ai_float*)in_data)[j] = good_image_data[i][j];
+		  	  	  		  ((ai_float*)in_data)[j] = image_data[i][j];
 		  	  	  	  }
 
+		  	  	  	  timer_val = __HAL_TIM_GET_COUNTER(&htim14);
 		  	  	  	  aiRun(in_data, out_data);
+		  	  	  	  timer_val = __HAL_TIM_GET_COUNTER(&htim14) - timer_val;
+
+		  	  	  	  uart_buf_len = sprintf(uart_buf, "%u us\r\n", timer_val);
+		  	  	      HAL_UART_Transmit(&huart1, (uint8_t *)uart_buf, uart_buf_len, 100);
 
 		  	  	  	  argmax_output = argmax(out_data);
-
-		  	  	  	  if (argmax_output == 1){
-		  	  	  		  counter++;
-		  	  	  	  }
+		  	  	  	  final_outputs[i] = argmax_output;
 
 
 		  	  	  	  //HAL_UART_Transmit(&huart1, message, 50, HAL_MAX_DELAY);
 //		  	  	  	  HAL_Delay(2000);
 	  }
 
-	  acc = get_accuracy(counter, 5.0);
-	  counter = 0;
+	  //acc = get_accuracy(counter, 5.0);
+
+	  uart_buf_len = sprintf(uart_buf, "\r\n \r\n \r\n \r\n");
+	  HAL_UART_Transmit(&huart1, (uint8_t *)uart_buf, uart_buf_len, 100);
+//	  calculate_true_positives(final_outputs, 5);
+//	  calculate_false_negatives(final_outputs, 5);
+	  calculate_false_positives(final_outputs, 3);
+	  calculate_true_negatives(final_outputs, 3);
 
     /* USER CODE END WHILE */
 
@@ -309,51 +373,70 @@ static void MX_CRC_Init(void)
 
 }
 
-/* FMC initialization function */
-static void MX_FMC_Init(void)
+/**
+  * @brief TIM14 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_TIM14_Init(void)
 {
 
-  /* USER CODE BEGIN FMC_Init 0 */
+  /* USER CODE BEGIN TIM14_Init 0 */
 
-  /* USER CODE END FMC_Init 0 */
+  /* USER CODE END TIM14_Init 0 */
 
-  FMC_SDRAM_TimingTypeDef SdramTiming = {0};
+  /* USER CODE BEGIN TIM14_Init 1 */
 
-  /* USER CODE BEGIN FMC_Init 1 */
-
-  /* USER CODE END FMC_Init 1 */
-
-  /** Perform the SDRAM1 memory initialization sequence
-  */
-  hsdram1.Instance = FMC_SDRAM_DEVICE;
-  /* hsdram1.Init */
-  hsdram1.Init.SDBank = FMC_SDRAM_BANK1;
-  hsdram1.Init.ColumnBitsNumber = FMC_SDRAM_COLUMN_BITS_NUM_8;
-  hsdram1.Init.RowBitsNumber = FMC_SDRAM_ROW_BITS_NUM_12;
-  hsdram1.Init.MemoryDataWidth = FMC_SDRAM_MEM_BUS_WIDTH_32;
-  hsdram1.Init.InternalBankNumber = FMC_SDRAM_INTERN_BANKS_NUM_4;
-  hsdram1.Init.CASLatency = FMC_SDRAM_CAS_LATENCY_1;
-  hsdram1.Init.WriteProtection = FMC_SDRAM_WRITE_PROTECTION_DISABLE;
-  hsdram1.Init.SDClockPeriod = FMC_SDRAM_CLOCK_DISABLE;
-  hsdram1.Init.ReadBurst = FMC_SDRAM_RBURST_DISABLE;
-  hsdram1.Init.ReadPipeDelay = FMC_SDRAM_RPIPE_DELAY_0;
-  /* SdramTiming */
-  SdramTiming.LoadToActiveDelay = 16;
-  SdramTiming.ExitSelfRefreshDelay = 16;
-  SdramTiming.SelfRefreshTime = 16;
-  SdramTiming.RowCycleDelay = 16;
-  SdramTiming.WriteRecoveryTime = 16;
-  SdramTiming.RPDelay = 16;
-  SdramTiming.RCDDelay = 16;
-
-  if (HAL_SDRAM_Init(&hsdram1, &SdramTiming) != HAL_OK)
+  /* USER CODE END TIM14_Init 1 */
+  htim14.Instance = TIM14;
+  htim14.Init.Prescaler = 107;
+  htim14.Init.CounterMode = TIM_COUNTERMODE_UP;
+  htim14.Init.Period = 65535;
+  htim14.Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
+  htim14.Init.AutoReloadPreload = TIM_AUTORELOAD_PRELOAD_DISABLE;
+  if (HAL_TIM_Base_Init(&htim14) != HAL_OK)
   {
-    Error_Handler( );
+    Error_Handler();
   }
+  /* USER CODE BEGIN TIM14_Init 2 */
 
-  /* USER CODE BEGIN FMC_Init 2 */
+  /* USER CODE END TIM14_Init 2 */
 
-  /* USER CODE END FMC_Init 2 */
+}
+
+/**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  huart1.Init.OneBitSampling = UART_ONE_BIT_SAMPLE_DISABLE;
+  huart1.AdvancedInit.AdvFeatureInit = UART_ADVFEATURE_NO_INIT;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
 }
 
 /**
@@ -367,11 +450,7 @@ static void MX_GPIO_Init(void)
 /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
-  __HAL_RCC_GPIOE_CLK_ENABLE();
-  __HAL_RCC_GPIOG_CLK_ENABLE();
-  __HAL_RCC_GPIOD_CLK_ENABLE();
-  __HAL_RCC_GPIOI_CLK_ENABLE();
-  __HAL_RCC_GPIOF_CLK_ENABLE();
+  __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOH_CLK_ENABLE();
 
 /* USER CODE BEGIN MX_GPIO_Init_2 */
