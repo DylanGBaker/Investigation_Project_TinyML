@@ -1,0 +1,168 @@
+STEdgeAI Core v9.0.0-19802
+Created date          : 2024-10-04 11:47:40
+Parameters            : generate --target stm32f7 --name network -m C:/Varsity/Year of Study 4 (IE)/Semester 2/Investigation Project/Project Implementation/GitHub Repo/Investigation_Project_TinyML/Saved_Models/2DConv_NN/Cable-100V2-Accuracy-2D-tflite.tflite --compression medium --verbosity 1 --allocate-inputs --allocate-outputs --workspace C:/Users/DILDOB~1/AppData/Local/Temp/mxAI_workspace168485732431000978911619778446565 --output C:/Users/Dildo Baggins/.stm32cubemx/network_output
+
+Exec/report summary (generate)
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+model file         :   C:\Varsity\Year of Study 4 (IE)\Semester 2\Investigation Project\Project Implementation\GitHub Repo\Investigation_Project_TinyML\Saved_Models\2DConv_NN\Cable-100V2-Accuracy-2D-tflite.tflite   
+type               :   tflite                                                                                                                                                                                          
+c_name             :   network                                                                                                                                                                                         
+compression        :   medium                                                                                                                                                                                          
+options            :   allocate-inputs, allocate-outputs                                                                                                                                                               
+optimization       :   balanced                                                                                                                                                                                        
+target/series      :   stm32f7                                                                                                                                                                                         
+workspace dir      :   C:\Users\DILDOB~1\AppData\Local\Temp\mxAI_workspace168485732431000978911619778446565                                                                                                            
+output dir         :   C:\Users\Dildo Baggins\.stm32cubemx\network_output                                                                                                                                              
+model_fmt          :   float                                                                                                                                                                                           
+model_name         :   Cable100V2Accuracy2Dtflite                                                                                                                                                                      
+model_hash         :   0x9b3a9de6b44ad20f6052dd2a7e7f230c                                                                                                                                                              
+params #           :   2,362,978 items (9.01 MiB)                                                                                                                                                                      
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+input 1/1          :   'serving_default_input_10', f32(1x100x100x3), 117.19 KBytes, activations                                                                                                                        
+output 1/1         :   'nl_6', f32(1x2), 8 Bytes, activations                                                                                                                                                          
+macc               :   10,942,032                                                                                                                                                                                      
+weights (ro)       :   1,194,440 B (1166.45 KiB) (1 segment) / -8,257,472(-87.4%) vs float model                                                                                                                       
+activations (rw)   :   369,240 B (360.59 KiB) (1 segment) *                                                                                                                                                            
+ram (total)        :   369,240 B (360.59 KiB) = 369,240 + 0 + 0                                                                                                                                                        
+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(*) 'input'/'output' buffers can be used from the activations buffer
+
+Model name - Cable100V2Accuracy2Dtflite
+------ ----------------------------------------------------------- ----------------------- --------------------- ----------- ------------------------------------------- --- -------------------- ---------------------- ---------------------------- 
+m_id   layer (type,original)                                       oshape                  param/size                   macc                                connected to   | c_size               c_macc                 c_type                       
+------ ----------------------------------------------------------- ----------------------- --------------------- ----------- ------------------------------------------- --- -------------------- ---------------------- ---------------------------- 
+0      serving_default_input_10 (Input, )                          [b:1,h:100,w:100,c:3]                                                                                   |                      +30,000(+100.0%)       Pool_[0]                     
+       pool_0 (Pool, MAX_POOL_2D)                                  [b:1,h:50,w:50,c:3]                                30,000                    serving_default_input_10   |                      -30,000(-100.0%)       
+------ ----------------------------------------------------------- ----------------------- --------------------- ----------- ------------------------------------------- --- -------------------- ---------------------- ---------------------------- 
+1      conv2d_1 (Conv2D, CONV_2D)                                  [b:1,h:48,w:48,c:128]   3,584/14,336            7,962,752                                      pool_0   | -14,336(-100.0%)     -7,962,752(-100.0%)    
+       nl_1_nl (Nonlinearity, CONV_2D)                             [b:1,h:48,w:48,c:128]                             294,912                                    conv2d_1   |                      -294,912(-100.0%)      
+------ ----------------------------------------------------------- ----------------------- --------------------- ----------- ------------------------------------------- --- -------------------- ---------------------- ---------------------------- 
+2      pool_2 (Pool, MAX_POOL_2D)                                  [b:1,h:24,w:24,c:128]                             294,912                                     nl_1_nl   | +14,336(+100.0%)     +8,257,664(+2800.0%)   Conv2D_[1]                   
+------ ----------------------------------------------------------- ----------------------- --------------------- ----------- ------------------------------------------- --- -------------------- ---------------------- ---------------------------- 
+3      reshape_3 (Reshape, RESHAPE)                                [b:1,c:73728]                                                                                  pool_2   |                                             
+------ ----------------------------------------------------------- ----------------------- --------------------- ----------- ------------------------------------------- --- -------------------- ---------------------- ---------------------------- 
+4      sequential_dense_MatMul (Placeholder, )                     [h:32,c:73728]          2,359,296/9,437,184                                                             | -8,257,408(-87.5%)   +2,359,360(+100.0%)    Dense_/Nonlinearity_[2, 3]   
+       sequential_dense_BiasAdd_ReadVariableOp (Placeholder, )     [c:32]                  32/128                                                                          | -128(-100.0%)                               
+       gemm_4 (Gemm, FULLY_CONNECTED)                              [b:1,c:32]                                      2,359,328                                   reshape_3   |                      -2,359,328(-100.0%)    
+                                                                                                                                                 sequential_dense_MatMul   | 
+                                                                                                                                 sequential_dense_BiasAdd_ReadVariableOp   | 
+       nl_4_nl (Nonlinearity, FULLY_CONNECTED)                     [b:1,c:32]                                             32                                      gemm_4   |                      -32(-100.0%)           
+------ ----------------------------------------------------------- ----------------------- --------------------- ----------- ------------------------------------------- --- -------------------- ---------------------- ---------------------------- 
+5      sequential_dense_1_MatMul (Placeholder, )                   [h:2,c:32]              64/256                                                                          | +8(+3.1%)            +66(+100.0%)           Dense_[4]                    
+       sequential_dense_1_BiasAdd_ReadVariableOp (Placeholder, )   [c:2]                   2/8                                                                             | -8(-100.0%)                                 
+       gemm_5 (Gemm, FULLY_CONNECTED)                              [b:1,c:2]                                              66                                     nl_4_nl   |                      -66(-100.0%)           
+                                                                                                                                               sequential_dense_1_MatMul   | 
+                                                                                                                               sequential_dense_1_BiasAdd_ReadVariableOp   | 
+------ ----------------------------------------------------------- ----------------------- --------------------- ----------- ------------------------------------------- --- -------------------- ---------------------- ---------------------------- 
+6      nl_6 (Nonlinearity, SOFTMAX)                                [b:1,c:2]                                              30                                      gemm_5   |                                             Nonlinearity_[o][5]          
+------ ----------------------------------------------------------- ----------------------- --------------------- ----------- ------------------------------------------- --- -------------------- ---------------------- ---------------------------- 
+model/c-model: macc=10,942,032/10,942,032  weights=9,451,912/1,194,440 -8,257,472(-87.4%) activations=--/369,240 io=--/0
+
+
+
+Generated C-graph summary
+------------------------------------------------------------------------------------------------------------------------
+model name            : Cable100V2Accuracy2Dtflite
+c-name                : network
+c-node #              : 6
+c-array #             : 14
+activations size      : 369240 (1 segment)
+weights size          : 1194440 (1 segment)
+macc                  : 10942032
+inputs                : ['serving_default_input_10_output']
+outputs               : ['nl_6_output']
+
+C-Arrays (14)
+------ --------------------------------- ----------------- ------------------------- ------------------ --------- 
+c_id   name (*_array)                    item/size         domain/mem-pool           c-type             comment   
+------ --------------------------------- ----------------- ------------------------- ------------------ --------- 
+0      conv2d_1_bias                     128/512           weights/weights           const float                  
+1      conv2d_1_output                   73728/294912      activations/**default**   float                        
+2      conv2d_1_scratch0                 12288/49152       activations/**default**   float                        
+3      conv2d_1_weights                  3456/13824        weights/weights           const float                  
+4      gemm_4_bias                       32/128            weights/weights           const float                  
+5      gemm_4_output                     32/128            activations/**default**   float                        
+6      gemm_4_weights                    2359296/1179648   weights/weights           const lut4_float             
+7      gemm_5_bias                       2/8               weights/weights           const float                  
+8      gemm_5_output                     2/8               activations/**default**   float                        
+9      gemm_5_weights                    64/256            weights/weights           const float                  
+10     nl_4_nl_output                    32/128            activations/**default**   float                        
+11     nl_6_output                       2/8               activations/**default**   float              /output   
+12     pool_0_output                     7500/30000        activations/**default**   float                        
+13     serving_default_input_10_output   30000/120000      activations/**default**   float              /input    
+------ --------------------------------- ----------------- ------------------------- ------------------ --------- 
+
+C-Layers (6)
+------ ---------------- ---- --------------- --------- --------- ------------------------------------ ----------------------- 
+c_id   name (*_layer)   id   layer_type      macc      rom       tensors                              shape (array id)        
+------ ---------------- ---- --------------- --------- --------- ------------------------------------ ----------------------- 
+0      pool_0           0    Pool            30000     0         I: serving_default_input_10_output   f32(1x100x100x3) (13)   
+                                                                 O: pool_0_output                     f32(1x50x50x3) (12)     
+------ ---------------- ---- --------------- --------- --------- ------------------------------------ ----------------------- 
+1      conv2d_1         2    Conv2D          8552576   14336     I: pool_0_output                     f32(1x50x50x3) (12)     
+                                                                 S: conv2d_1_scratch0                                         
+                                                                 W: conv2d_1_weights                  f32(128x3x3x3) (3)      
+                                                                 W: conv2d_1_bias                     f32(128) (0)            
+                                                                 O: conv2d_1_output                   f32(1x24x24x128) (1)    
+------ ---------------- ---- --------------- --------- --------- ------------------------------------ ----------------------- 
+2      gemm_4           4    Dense           2359328   1179776   I: conv2d_1_output                   f32(1x24x24x128) (1)    
+                                                                 W: gemm_4_weights                    c4(32x73728) (6)        
+                                                                 W: gemm_4_bias                       f32(32) (4)             
+                                                                 O: gemm_4_output                     f32(1x32) (5)           
+------ ---------------- ---- --------------- --------- --------- ------------------------------------ ----------------------- 
+3      nl_4_nl          4    Nonlinearity    32        0         I: gemm_4_output                     f32(1x32) (5)           
+                                                                 O: nl_4_nl_output                    f32(1x32) (10)          
+------ ---------------- ---- --------------- --------- --------- ------------------------------------ ----------------------- 
+4      gemm_5           5    Dense           66        264       I: nl_4_nl_output                    f32(1x32) (10)          
+                                                                 W: gemm_5_weights                    f32(2x32) (9)           
+                                                                 W: gemm_5_bias                       f32(2) (7)              
+                                                                 O: gemm_5_output                     f32(1x2) (8)            
+------ ---------------- ---- --------------- --------- --------- ------------------------------------ ----------------------- 
+5      nl_6             6    Nonlinearity    30        0         I: gemm_5_output                     f32(1x2) (8)            
+                                                                 O: nl_6_output                       f32(1x2) (11)           
+------ ---------------- ---- --------------- --------- --------- ------------------------------------ ----------------------- 
+
+
+
+Number of operations per c-layer
+------- ------ ------------------------ ------------ -------------- 
+c_id    m_id   name (type)                       #op           type 
+------- ------ ------------------------ ------------ -------------- 
+0       0      pool_0 (Pool)                  30,000   smul_f32_f32 
+1       2      conv2d_1 (Conv2D)           8,552,576   smul_f32_f32 
+2       4      gemm_4 (Dense)              2,359,328    smul_f32_f4 
+3       4      nl_4_nl (Nonlinearity)             32     op_f32_f32 
+4       5      gemm_5 (Dense)                     66   smul_f32_f32 
+5       6      nl_6 (Nonlinearity)                30     op_f32_f32 
+------- ------ ------------------------ ------------ -------------- 
+total                                     10,942,032 
+
+Number of operation types
+---------------- ----------- ----------- 
+operation type             #           % 
+---------------- ----------- ----------- 
+smul_f32_f32       8,582,642       78.4% 
+smul_f32_f4        2,359,328       21.6% 
+op_f32_f32                62        0.0% 
+
+Complexity report (model)
+------ --------------------------- ------------------------- ------------------------- -------- 
+m_id   name                        c_macc                    c_rom                     c_id     
+------ --------------------------- ------------------------- ------------------------- -------- 
+0      serving_default_input_10    |                  0.3%   |                  0.0%   [0]      
+2      pool_2                      ||||||||||||||||  78.2%   |                  1.2%   [1]      
+4      sequential_dense_MatMul     |||||             21.6%   ||||||||||||||||  98.8%   [2, 3]   
+5      sequential_dense_1_MatMul   |                  0.0%   |                  0.0%   [4]      
+6      nl_6                        |                  0.0%   |                  0.0%   [5]      
+------ --------------------------- ------------------------- ------------------------- -------- 
+macc=10,942,032 weights=1,194,440 act=369,240 ram_io=0
+
+Generated files (7)
+-------------------------------------------------------------------------- 
+C:\Users\Dildo Baggins\.stm32cubemx\network_output\network_data_params.h   
+C:\Users\Dildo Baggins\.stm32cubemx\network_output\network_data_params.c   
+C:\Users\Dildo Baggins\.stm32cubemx\network_output\network_data.h          
+C:\Users\Dildo Baggins\.stm32cubemx\network_output\network_data.c          
+C:\Users\Dildo Baggins\.stm32cubemx\network_output\network_config.h        
+C:\Users\Dildo Baggins\.stm32cubemx\network_output\network.h               
+C:\Users\Dildo Baggins\.stm32cubemx\network_output\network.c               

@@ -1,0 +1,158 @@
+STEdgeAI Core v9.0.0-19802
+Created date          : 2024-10-04 10:51:07
+Parameters            : generate --target stm32f7 --name network -m C:/Varsity/Year of Study 4 (IE)/Semester 2/Investigation Project/Project Implementation/GitHub Repo/Investigation_Project_TinyML/Saved_Models/2DConv_NN/Cable-100V2-Accuracy-2D.keras --compression high --verbosity 1 --allocate-inputs --allocate-outputs --workspace C:/Users/DILDOB~1/AppData/Local/Temp/mxAI_workspace16509405693480013605808222174548238 --output C:/Users/Dildo Baggins/.stm32cubemx/network_output
+
+Exec/report summary (generate)
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+model file         :   C:\Varsity\Year of Study 4 (IE)\Semester 2\Investigation Project\Project Implementation\GitHub Repo\Investigation_Project_TinyML\Saved_Models\2DConv_NN\Cable-100V2-Accuracy-2D.keras   
+type               :   keras                                                                                                                                                                                   
+c_name             :   network                                                                                                                                                                                 
+compression        :   high                                                                                                                                                                                    
+options            :   allocate-inputs, allocate-outputs                                                                                                                                                       
+optimization       :   balanced                                                                                                                                                                                
+target/series      :   stm32f7                                                                                                                                                                                 
+workspace dir      :   C:\Users\DILDOB~1\AppData\Local\Temp\mxAI_workspace16509405693480013605808222174548238                                                                                                  
+output dir         :   C:\Users\Dildo Baggins\.stm32cubemx\network_output                                                                                                                                      
+model_fmt          :   float                                                                                                                                                                                   
+model_name         :   Cable100V2Accuracy2D                                                                                                                                                                    
+model_hash         :   0x02e1d091d1b0ebda7e784b2df4b04ae4                                                                                                                                                      
+params #           :   2,362,978 items (9.01 MiB)                                                                                                                                                              
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+input 1/1          :   'input_0', f32(1x100x100x3), 117.19 KBytes, activations                                                                                                                                 
+output 1/1         :   'dense_1', f32(1x2), 8 Bytes, activations                                                                                                                                               
+macc               :   10,942,032                                                                                                                                                                              
+weights (ro)       :   1,194,440 B (1166.45 KiB) (1 segment) / -8,257,472(-87.4%) vs float model                                                                                                               
+activations (rw)   :   369,240 B (360.59 KiB) (1 segment) *                                                                                                                                                    
+ram (total)        :   369,240 B (360.59 KiB) = 369,240 + 0 + 0                                                                                                                                                
+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+(*) 'input'/'output' buffers can be used from the activations buffer
+
+Model name - Cable100V2Accuracy2D
+------ -------------------------------------- ----------------------- --------------------- ----------- ----------------- --- -------------------- ---------------------- ------------------------------- 
+m_id   layer (type,original)                  oshape                  param/size                   macc      connected to   | c_size               c_macc                 c_type                          
+------ -------------------------------------- ----------------------- --------------------- ----------- ----------------- --- -------------------- ---------------------- ------------------------------- 
+0      input_0 (Input, None)                  [b:1,h:100,w:100,c:3]                                                         |                      +30,000(+100.0%)       Pool_[0]                        
+       max_pooling2d (Pool, MaxPooling2D)     [b:1,h:50,w:50,c:3]                                30,000           input_0   |                      -30,000(-100.0%)       
+------ -------------------------------------- ----------------------- --------------------- ----------- ----------------- --- -------------------- ---------------------- ------------------------------- 
+1      conv2d_conv2d (Conv2D, Conv2D)         [b:1,h:48,w:48,c:128]   3,584/14,336            7,962,752     max_pooling2d   | -14,336(-100.0%)     -7,962,752(-100.0%)    
+       conv2d (Nonlinearity, Conv2D)          [b:1,h:48,w:48,c:128]                             294,912     conv2d_conv2d   |                      -294,912(-100.0%)      
+------ -------------------------------------- ----------------------- --------------------- ----------- ----------------- --- -------------------- ---------------------- ------------------------------- 
+2      max_pooling2d_1 (Pool, MaxPooling2D)   [b:1,h:24,w:24,c:128]                             294,912            conv2d   | +14,336(+100.0%)     +8,257,664(+2800.0%)   Conv2D_[1]                      
+------ -------------------------------------- ----------------------- --------------------- ----------- ----------------- --- -------------------- ---------------------- ------------------------------- 
+3      flatten (Reshape, Flatten)             [b:1,c:73728]                                               max_pooling2d_1   |                                             
+------ -------------------------------------- ----------------------- --------------------- ----------- ----------------- --- -------------------- ---------------------- ------------------------------- 
+4      dense_dense (Dense, Dense)             [b:1,c:32]              2,359,328/9,437,312     2,359,328           flatten   | -8,257,536(-87.5%)   +32(+0.0%)             Dense_/Nonlinearity_[2, 3]      
+       dense (Nonlinearity, Dense)            [b:1,c:32]                                             32       dense_dense   |                      -32(-100.0%)           
+------ -------------------------------------- ----------------------- --------------------- ----------- ----------------- --- -------------------- ---------------------- ------------------------------- 
+5      dense_1_dense (Dense, Dense)           [b:1,c:2]               66/264                         66             dense   |                      +30(+45.5%)            Dense_/Nonlinearity_[o][4, 5]   
+       dense_1 (Nonlinearity, Dense)          [b:1,c:2]                                              30     dense_1_dense   |                      -30(-100.0%)           
+------ -------------------------------------- ----------------------- --------------------- ----------- ----------------- --- -------------------- ---------------------- ------------------------------- 
+model/c-model: macc=10,942,032/10,942,032  weights=9,451,912/1,194,440 -8,257,472(-87.4%) activations=--/369,240 io=--/0
+
+
+
+Generated C-graph summary
+------------------------------------------------------------------------------------------------------------------------
+model name            : Cable100V2Accuracy2D
+c-name                : network
+c-node #              : 6
+c-array #             : 14
+activations size      : 369240 (1 segment)
+weights size          : 1194440 (1 segment)
+macc                  : 10942032
+inputs                : ['input_0_output']
+outputs               : ['dense_1_output']
+
+C-Arrays (14)
+------ ------------------------ ----------------- ------------------------- ------------------ --------- 
+c_id   name (*_array)           item/size         domain/mem-pool           c-type             comment   
+------ ------------------------ ----------------- ------------------------- ------------------ --------- 
+0      conv2d_conv2d_bias       128/512           weights/weights           const float                  
+1      conv2d_conv2d_output     73728/294912      activations/**default**   float                        
+2      conv2d_conv2d_scratch0   12288/49152       activations/**default**   float                        
+3      conv2d_conv2d_weights    3456/13824        weights/weights           const float                  
+4      dense_1_dense_bias       2/8               weights/weights           const float                  
+5      dense_1_dense_output     2/8               activations/**default**   float                        
+6      dense_1_dense_weights    64/256            weights/weights           const float                  
+7      dense_1_output           2/8               activations/**default**   float              /output   
+8      dense_dense_bias         32/128            weights/weights           const float                  
+9      dense_dense_output       32/128            activations/**default**   float                        
+10     dense_dense_weights      2359296/1179648   weights/weights           const lut4_float             
+11     dense_output             32/128            activations/**default**   float                        
+12     input_0_output           30000/120000      activations/**default**   float              /input    
+13     max_pooling2d_output     7500/30000        activations/**default**   float                        
+------ ------------------------ ----------------- ------------------------- ------------------ --------- 
+
+C-Layers (6)
+------ ---------------- ---- --------------- --------- --------- --------------------------- ----------------------- 
+c_id   name (*_layer)   id   layer_type      macc      rom       tensors                     shape (array id)        
+------ ---------------- ---- --------------- --------- --------- --------------------------- ----------------------- 
+0      max_pooling2d    0    Pool            30000     0         I: input_0_output           f32(1x100x100x3) (12)   
+                                                                 O: max_pooling2d_output     f32(1x50x50x3) (13)     
+------ ---------------- ---- --------------- --------- --------- --------------------------- ----------------------- 
+1      conv2d_conv2d    2    Conv2D          8552576   14336     I: max_pooling2d_output     f32(1x50x50x3) (13)     
+                                                                 S: conv2d_conv2d_scratch0                           
+                                                                 W: conv2d_conv2d_weights    f32(128x3x3x3) (3)      
+                                                                 W: conv2d_conv2d_bias       f32(128) (0)            
+                                                                 O: conv2d_conv2d_output     f32(1x24x24x128) (1)    
+------ ---------------- ---- --------------- --------- --------- --------------------------- ----------------------- 
+2      dense_dense      4    Dense           2359328   1179776   I: conv2d_conv2d_output     f32(1x24x24x128) (1)    
+                                                                 W: dense_dense_weights      c4(32x73728) (10)       
+                                                                 W: dense_dense_bias         f32(32) (8)             
+                                                                 O: dense_dense_output       f32(1x32) (9)           
+------ ---------------- ---- --------------- --------- --------- --------------------------- ----------------------- 
+3      dense            4    Nonlinearity    32        0         I: dense_dense_output       f32(1x32) (9)           
+                                                                 O: dense_output             f32(1x32) (11)          
+------ ---------------- ---- --------------- --------- --------- --------------------------- ----------------------- 
+4      dense_1_dense    5    Dense           66        264       I: dense_output             f32(1x32) (11)          
+                                                                 W: dense_1_dense_weights    f32(2x32) (6)           
+                                                                 W: dense_1_dense_bias       f32(2) (4)              
+                                                                 O: dense_1_dense_output     f32(1x2) (5)            
+------ ---------------- ---- --------------- --------- --------- --------------------------- ----------------------- 
+5      dense_1          5    Nonlinearity    30        0         I: dense_1_dense_output     f32(1x2) (5)            
+                                                                 O: dense_1_output           f32(1x2) (7)            
+------ ---------------- ---- --------------- --------- --------- --------------------------- ----------------------- 
+
+
+
+Number of operations per c-layer
+------- ------ ------------------------ ------------ -------------- 
+c_id    m_id   name (type)                       #op           type 
+------- ------ ------------------------ ------------ -------------- 
+0       0      max_pooling2d (Pool)           30,000   smul_f32_f32 
+1       2      conv2d_conv2d (Conv2D)      8,552,576   smul_f32_f32 
+2       4      dense_dense (Dense)         2,359,328    smul_f32_f4 
+3       4      dense (Nonlinearity)               32     op_f32_f32 
+4       5      dense_1_dense (Dense)              66   smul_f32_f32 
+5       5      dense_1 (Nonlinearity)             30     op_f32_f32 
+------- ------ ------------------------ ------------ -------------- 
+total                                     10,942,032 
+
+Number of operation types
+---------------- ----------- ----------- 
+operation type             #           % 
+---------------- ----------- ----------- 
+smul_f32_f32       8,582,642       78.4% 
+smul_f32_f4        2,359,328       21.6% 
+op_f32_f32                62        0.0% 
+
+Complexity report (model)
+------ ----------------- ------------------------- ------------------------- -------- 
+m_id   name              c_macc                    c_rom                     c_id     
+------ ----------------- ------------------------- ------------------------- -------- 
+0      input_0           |                  0.3%   |                  0.0%   [0]      
+2      max_pooling2d_1   ||||||||||||||||  78.2%   |                  1.2%   [1]      
+4      dense_dense       |||||             21.6%   ||||||||||||||||  98.8%   [2, 3]   
+5      dense_1_dense     |                  0.0%   |                  0.0%   [4, 5]   
+------ ----------------- ------------------------- ------------------------- -------- 
+macc=10,942,032 weights=1,194,440 act=369,240 ram_io=0
+
+Generated files (7)
+-------------------------------------------------------------------------- 
+C:\Users\Dildo Baggins\.stm32cubemx\network_output\network_data_params.h   
+C:\Users\Dildo Baggins\.stm32cubemx\network_output\network_data_params.c   
+C:\Users\Dildo Baggins\.stm32cubemx\network_output\network_data.h          
+C:\Users\Dildo Baggins\.stm32cubemx\network_output\network_data.c          
+C:\Users\Dildo Baggins\.stm32cubemx\network_output\network_config.h        
+C:\Users\Dildo Baggins\.stm32cubemx\network_output\network.h               
+C:\Users\Dildo Baggins\.stm32cubemx\network_output\network.c               
