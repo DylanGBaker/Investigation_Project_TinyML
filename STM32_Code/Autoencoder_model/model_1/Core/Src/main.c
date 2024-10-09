@@ -23,7 +23,7 @@
 /* USER CODE BEGIN Includes */
 #include "network.h"
 #include "network_data.h"
-#include "good_image_data_3.h"
+#include "anomaly_image_data_0.h"
 #include "math.h"
 
 /* USER CODE END Includes */
@@ -263,7 +263,7 @@ int main(void)
   {
 	  for (int i = 0; i < 13; i++){
 		  for (int j = 0; j < AI_NETWORK_IN_1_SIZE; j++){
-		  	  	  		  ((ai_float*)in_data)[j] = good_image_data[i][j];
+		  	  	  		  ((ai_float*)in_data)[j] = anomaly_image_data_0[i][j];
 		  	  	  	  }
 
 		  	  	  	  timer_val = __HAL_TIM_GET_COUNTER(&htim14);

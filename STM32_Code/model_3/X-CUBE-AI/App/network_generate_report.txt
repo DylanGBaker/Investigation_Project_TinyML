@@ -1,6 +1,6 @@
 STEdgeAI Core v9.0.0-19802
-Created date          : 2024-10-03 19:04:39
-Parameters            : generate --target stm32f7 --name network -m C:/Varsity/Year of Study 4 (IE)/Semester 2/Investigation Project/Project Implementation/GitHub Repo/Investigation_Project_TinyML/Saved_Models/Normal_NN/Cable-98-Accuracy-db-tflite.tflite --compression low --verbosity 1 --allocate-inputs --allocate-outputs --workspace C:/Users/DILDOB~1/AppData/Local/Temp/mxAI_workspace10830025277220014262076970437082746 --output C:/Users/Dildo Baggins/.stm32cubemx/network_output
+Created date          : 2024-10-08 01:27:29
+Parameters            : generate --target stm32f7 --name network -m C:/Varsity/Year of Study 4 (IE)/Semester 2/Investigation Project/Project Implementation/GitHub Repo/Investigation_Project_TinyML/Saved_Models/Normal_NN/Cable-98-Accuracy-db-tflite.tflite --compression low --verbosity 1 --allocate-inputs --allocate-outputs --workspace C:/Users/DILDOB~1/AppData/Local/Temp/mxAI_workspace196266610524004103063567003666768 --output C:/Users/Dildo Baggins/.stm32cubemx/network_output
 
 Exec/report summary (generate)
 --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -11,7 +11,7 @@ compression        :   low
 options            :   allocate-inputs, allocate-outputs                                                                                                                                                            
 optimization       :   balanced                                                                                                                                                                                     
 target/series      :   stm32f7                                                                                                                                                                                      
-workspace dir      :   C:\Users\DILDOB~1\AppData\Local\Temp\mxAI_workspace10830025277220014262076970437082746                                                                                                       
+workspace dir      :   C:\Users\DILDOB~1\AppData\Local\Temp\mxAI_workspace196266610524004103063567003666768                                                                                                         
 output dir         :   C:\Users\Dildo Baggins\.stm32cubemx\network_output                                                                                                                                           
 model_fmt          :   float                                                                                                                                                                                        
 model_name         :   Cable98Accuracydbtflite                                                                                                                                                                      

@@ -23,7 +23,7 @@
 /* USER CODE BEGIN Includes */
 #include "network.h"
 #include "network_data.h"
-#include "good_image_data_10.h"
+#include "anomaly_image_data_0.h"
 #include "stdio.h"
 
 /* USER CODE END Includes */
